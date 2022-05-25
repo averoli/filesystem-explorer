@@ -8,11 +8,11 @@
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
   <link href="./style.css" rel="stylesheet" />
+  <script src="./scripts/script.js" type="module"></script>
   <title>System file explorer</title>
 </head>
 
 <body>
-
   <div class="container">
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
@@ -32,6 +32,37 @@
                 Upload file:
                 <input type="file" name="fileToUpload" id="fileToUpload">
               </form>
+              <button id="createNewFolder">New</button>
+              <?php
+
+
+              try {
+                $newFileName = "./root/3-create-write-file.txt";
+                $fileContent = 'This is the content of the "3-create-write-file.txt" file.';
+
+                // Now the file is created, but it's empty.
+                $file = fopen($newFileName, "w");
+
+                // Here we add the content to the file
+                fwrite($file, $fileContent);
+
+                // You can add new content to the file
+                fwrite($file, "\nNew content in a new line.");
+
+                $file = fopen($newFileName, "r");
+
+                // Print the content
+                $content = fread($file, filesize($newFileName));
+                echo nl2br($content);
+
+                // Close the file buffer
+                fclose($file);
+              } catch (Throwable $t) {
+                echo $t->getMessage();
+              }
+
+
+              ?>
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
               <ul class="folder-list" style="padding: 0">
