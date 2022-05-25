@@ -1,3 +1,9 @@
+<?php
+session_start();
+$_SESSION['root'] = "./assets/data/root/";
+$_SESSION['path'] = "./assets/data/root/";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +13,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-  <link href="./style.css" rel="stylesheet" />
+  <link href="./assets/css/style.css" rel="stylesheet" />
+  <script type="module" src="./assets/js/main.js"></script>
   <title>System file explorer</title>
 </head>
 
@@ -28,21 +35,25 @@
         <div class="ibox float-e-margins">
           <div class="ibox-content">
             <div class="file-manager">
-              <form class="mb-0" action="/.php" method="post" enctype="multipart/form-data">
+              <form class="mb-0" action="./assets/php/upload.php" method="post" enctype="multipart/form-data">
                 Upload file:
                 <input type="file" name="fileToUpload" id="fileToUpload">
+                <input type="submit" value="Upload" name="submit">
               </form>
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
-              <ul class="folder-list" style="padding: 0">
-                <li><a href=""><i class="fa fa-folder"></i> Files</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Pictures</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Web pages</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Illustrations</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Films</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Books</a></li>
-              </ul>
+              <ul class="folder-list" style="padding: 0" id="folderList">
+              <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
+                <?php
+                  $dir = scandir($_SESSION['path']);
+                  foreach ($dir as $key => $value) {
+                    if ($key > 1) {
+                      echo "<li id='folderList'><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i> $value </a></li>";
+                    }
+                  }
+                ?>
 
+              </ul>
               <div class="clearfix"></div>
             </div>
           </div>
