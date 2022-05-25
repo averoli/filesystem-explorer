@@ -28,44 +28,62 @@
         <div class="ibox float-e-margins">
           <div class="ibox-content">
             <div class="file-manager">
-              <form class="mb-0" action="/.php" method="post" enctype="multipart/form-data">
-                Upload file:
+              <form class="mb-0" action="folder.php" method="post" enctype="multipart/form-data">
                 <input type="file" name="fileToUpload" id="fileToUpload">
               </form>
-              <button id="createNewFolder">New</button>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFolderModal">New</button>
+
+              <!-- Modal -->
+              <div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="newFolderModalLabel">New folder</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <input type="text" class="form-control" name="folder-name" id="folderName">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="button" class="btn btn-primary" name="folder-button" id="createNewFolder">Create</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <?php
+              // try {
+              //   $newFileName = "./root/3-create-write-file.txt";
+              //   $fileContent = 'This is the content of the "3-create-write-file.txt" file.';
 
+              //   // Now the file is created, but it's empty.
+              //   $file = fopen($newFileName, "w");
 
-              try {
-                $newFileName = "./root/3-create-write-file.txt";
-                $fileContent = 'This is the content of the "3-create-write-file.txt" file.';
+              //   // Here we add the content to the file
+              //   fwrite($file, $fileContent);
 
-                // Now the file is created, but it's empty.
-                $file = fopen($newFileName, "w");
+              //   // You can add new content to the file
+              //   fwrite($file, "\nNew content in a new line.");
 
-                // Here we add the content to the file
-                fwrite($file, $fileContent);
+              //   $file = fopen($newFileName, "r");
 
-                // You can add new content to the file
-                fwrite($file, "\nNew content in a new line.");
+              //   // Print the content
+              //   $content = fread($file, filesize($newFileName));
+              //   echo nl2br($content);
 
-                $file = fopen($newFileName, "r");
-
-                // Print the content
-                $content = fread($file, filesize($newFileName));
-                echo nl2br($content);
-
-                // Close the file buffer
-                fclose($file);
-              } catch (Throwable $t) {
-                echo $t->getMessage();
-              }
+              //   // Close the file buffer
+              //   fclose($file);
+              // } catch (Throwable $t) {
+              //   echo $t->getMessage();
+              // }
 
 
               ?>
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
-              <ul class="folder-list" style="padding: 0">
+              <ul id="folderList" class="folder-list" style="padding: 0">
                 <li><a href=""><i class="fa fa-folder"></i> Files</a></li>
                 <li><a href=""><i class="fa fa-folder"></i> Pictures</a></li>
                 <li><a href=""><i class="fa fa-folder"></i> Web pages</a></li>

@@ -1,2 +1,0 @@
-This is the content of the "3-create-write-file.txt" file.
-New content in a new line.
