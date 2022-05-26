@@ -1,9 +1,7 @@
 <?php
 session_start();
-echo $_SESSION['path'] .'<br/>';
 $path = explode("/data", $_SESSION['path']);
 $target_dir = '../data' . $path[1];
-echo $target_dir  .'<br/>';
 $target_file = $target_dir .'/'. basename($_FILES["fileToUpload"]["name"]);
 $filename = $_FILES["fileToUpload"]["name"];
 $filetype = $_FILES["fileToUpload"]["type"];
@@ -17,5 +15,6 @@ if (isset($_POST["submit"])) {
         echo "<p>¡Posible ataque de subida de ficheros!</p>";
     }
 }
-// header('Location: ../../index.php');
+echo '?path='.$_SESSION['path'];
+header('Location: ../../index.php'. ?path=$_SESSION['path']);
 // header('Location: '. '?path='.$urlPath . '&message='.$messageShow);exit;

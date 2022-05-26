@@ -7,7 +7,6 @@ $urlPath = $dir;
 if (isset($_GET['path'])) {
   $urlPath = $_GET['path'];
   $_SESSION['path'] = $_GET['path'];
-  echo $_SESSION['path'];
 }
 
 $_SESSION['root'] = "./assets/data/root/";
