@@ -20,7 +20,6 @@ $_SESSION['currentPath'] = __DIR__;
 </head>
 
 <body>
-
   <div class="container">
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
@@ -41,10 +40,45 @@ $_SESSION['currentPath'] = __DIR__;
                 <input type="file" name="fileToUpload" id="fileToUpload">
                 <input type="submit" value="Upload" name="submit">
               </form>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFolderModal">New</button>
+
+              <!-- Modal -->
+              <div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="newFolderModalLabel">New folder</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form action="./assets/php/create.php" method="POST">
+                        <div class="mb-3">
+                          <input type="text" class="form-control" name="folderName">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-primary" name="folder-button" id="createNewFolder">Create</button>
+                    </div>
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
               <ul class="folder-list" style="padding: 0" id="folderList">
                 <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
+                <?php
+                $dir = scandir($_SESSION['path']);
+                foreach ($dir as $key => $value) {
+                  if ($key > 0) {
+                    echo "<li id='folderList'><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i> $value </a></li>";
+                  }
+                }
+                ?>
 
               </ul>
               <div class="clearfix"></div>
