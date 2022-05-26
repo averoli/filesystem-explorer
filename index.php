@@ -8,8 +8,6 @@ if (isset($_GET['path'])) {
   $_SESSION['path'] = $_GET['path'];
 }
 
-$_SESSION['root'] = "./assets/data/root/";
-
 //DELETE
 if (isset($_GET['delete'])) {
   $deleteFile = $_GET['delete'];
@@ -106,16 +104,6 @@ foreach ($fileListing as $file) {
                   $filePath = $_SESSION['path'] . '/' . $fileName;
                   echo "<li> <img src='./assets/data/images/folder_icon.png' width='12' /> <a href='?path=$filePath'>$fileName</a></li>";
                 }
-                // foreach ($files as $fileName) {
-                //   $fileInfo = $dir . "/" . $fileName;
-                //   $fullUrl = $_SERVER['REQUEST_URI'];
-                //   $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
-                //   $viewFile = $fullUrl . '&' . 'view=' .  $fileName;
-                //   echo "<li> <img src='./assets/data/images/file_icon.png' width='12' /> <a href='javascript:;'>$fileName</a> 
-                //       <a href='$viewFile' class='view_btn'>View</a>
-                //       <a href='$deleteUrl' class='delete_btn'>Delete</a>
-                //   </li>";
-                // }
                 ?>
 
               </ul>
@@ -146,20 +134,37 @@ foreach ($fileListing as $file) {
                         </div>";
             }
             foreach ($files as $fileName) {
-            $file_Icon;
-            switch (pathinfo($fileName)['extension']) {
-              case 'txt': case 'pdf': case 'doc': $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
-                break;
-              case 'png': case 'jpg' : $file_Icon = '<div class="image"><img alt="image" class="img-responsive"
-                src="https://via.placeholder.com/400x300/4169E1/000000"></div>';
-                break;
-              case 'webm': case 'mp4': case 'mpeg' : $file_Icon = "<div class='icon'><i class='img-responsive fa fa-film'></i></div>";
-              break;
-              case 'flac': case 'mp3': $file_Icon = "<div class='icon'><i class='fa fa-music'></i></div>";
-                break;
-              default: $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
-                break;
-            };
+              $fullUrl = $_SERVER['REQUEST_URI'];
+              $viewFile = $fullUrl . '&' . 'view=' .  $fileName;
+              $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
+              $file_Icon;
+              switch (pathinfo($fileName)['extension']) {
+                case 'txt':
+                case 'pdf':
+                case 'doc':
+                  $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
+                  break;
+                case 'png':
+                case 'jpg':
+                case 'jpeg':
+                  $file_Icon = '<div class="image">
+              <img alt="image" class="img-responsive" src=<?php ?>>
+              </div>';
+
+                  break;
+                case 'webm':
+                case 'mp4':
+                case 'mpeg':
+                  $file_Icon = "<div class='icon'><i class='img-responsive fa fa-film'></i></div>";
+                  break;
+                case 'flac':
+                case 'mp3':
+                  $file_Icon = "<div class='icon'><i class='fa fa-music'></i></div>";
+                  break;
+                default:
+                  $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
+                  break;
+              };
               echo "<div class='file-box'>
               <div class='file'>
                 <a href='javascript:;'>
@@ -167,17 +172,37 @@ foreach ($fileListing as $file) {
                     $file_Icon
                   <div class='file-name'> $fileName <br>
                   <small>Added: Jan 11, 2014</small> <br>
-                  <a href='javascript:;' class='view_btn'>View</a>
-                  <a href='javascript:;' class='delete_btn'>Delete</a>
+                  <a href='$viewFile' class='view_btn' data-bs-toggle='modal' data-bs-target='#viewModal'>
+                  View
+                
+                  </a>
+                  <div class='modal fade' id='viewModal' tabindex='-1' aria-labelledby='newFolderModalLabel' aria-hidden='true'>
+                <div class='modal-dialog'>
+                  <div class='modal-content'>
+                    <div class='modal-header'>
+                      <h5 class='modal-title' id='newFolderModalLabel'>$fileName</h5>
+                      <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                    </div>
+                    <div class='modal-body'>
+                    <iframe
+    width='560'
+    height='315'
+    src='./assets/php/open.php'
+    frameBorder='0'
+    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+    allowFullScreen
+></iframe>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                  <a href='$deleteUrl' class='delete_btn'>Delete</a>
                   </div>
                 </a>
               </div>
             </div>";
             }
             ?>
-
-
-
           </div>
         </div>
       </div>
