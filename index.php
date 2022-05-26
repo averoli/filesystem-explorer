@@ -2,6 +2,7 @@
 session_start();
 $_SESSION['root'] = "./assets/data/root/";
 $_SESSION['path'] = "./assets/data/root/";
+$_SESSION['currentPath'] = __DIR__;
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +13,7 @@ $_SESSION['path'] = "./assets/data/root/";
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" /> -->
   <link href="./assets/css/style.css" rel="stylesheet" />
   <script type="module" src="./assets/js/main.js"></script>
   <title>System file explorer</title>
@@ -43,15 +44,7 @@ $_SESSION['path'] = "./assets/data/root/";
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
               <ul class="folder-list" style="padding: 0" id="folderList">
-              <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
-                <?php
-                  $dir = scandir($_SESSION['path']);
-                  foreach ($dir as $key => $value) {
-                    if ($key > 1) {
-                      echo "<li id='folderList'><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i> $value </a></li>";
-                    }
-                  }
-                ?>
+                <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
 
               </ul>
               <div class="clearfix"></div>
