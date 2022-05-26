@@ -1,11 +1,10 @@
 <?php
 session_start();
 $dir = './assets/data/root';
-$_SESSION['path'] = $dir;
-$urlPath = $dir;
+$_SESSION['root'] = "./assets/data/root/";
+$_SESSION['path'] = $_SESSION['root'];
 
 if (isset($_GET['path'])) {
-  $urlPath = $_GET['path'];
   $_SESSION['path'] = $_GET['path'];
 }
 
@@ -14,22 +13,19 @@ $_SESSION['root'] = "./assets/data/root/";
 //DELETE
 if (isset($_GET['delete'])) {
   $deleteFile = $_GET['delete'];
-  $fullDeletePath = $urlPath . '/' . $deleteFile;
+  $fullDeletePath = $_SESSION['path'] . '/' . $deleteFile;
   if (file_exists($fullDeletePath)) {
     unlink($fullDeletePath);
   }
-  header('Location: ' . '?path=' . $urlPath);
+  header('Location: ' . '?path=' . $_SESSION['path']);
 }
 
-//remove theb '..' and '.' from my array
-// $_SESSION['path'] = array_diff(scandir('./assets/data/root'), array('..', '.'));
-
-$fileListing = array_diff(scandir($urlPath), array('..', '.'));
+$fileListing = array_diff(scandir($_SESSION['path']), array('..', '.'));
 
 $folders = array();
 $files = array();
 foreach ($fileListing as $file) {
-  $fileInfo = $urlPath . "/" . $file;
+  $fileInfo = $_SESSION['path'] . "/" . $file;
   if (is_dir($fileInfo)) {
     $folders[] = $file;
   } else {
@@ -106,8 +102,8 @@ foreach ($fileListing as $file) {
                   echo "<div>Folder is empty.</div>";
                 }
                 foreach ($folders as $fileName) {
-                  $fileInfo = $dir . "/" . $fileName;
-                  $filePath = $urlPath . '/' . $fileName;
+                  $fileInfo = $_SESSION['root']  . "/" . $fileName;
+                  $filePath = $_SESSION['path'] . '/' . $fileName;
                   echo "<li> <img src='./assets/data/images/folder_icon.png' width='12' /> <a href='?path=$filePath'>$fileName</a></li>";
                 }
                 // foreach ($files as $fileName) {
@@ -133,8 +129,8 @@ foreach ($fileListing as $file) {
           <div class="col-lg-12">
             <?php
             foreach ($folders as $fileName) {
-              $fileInfo = $dir . "/" . $fileName;
-              $filePath = $urlPath . '/' . $fileName;
+              $fileInfo = $_SESSION['root']  . "/" . $fileName;
+              $filePath = $_SESSION['path'] . '/' . $fileName;
               echo "<div class='file-box'>
                           <div class='file'>
                             <a href='?path=$filePath'>
