@@ -1,14 +1,11 @@
 <?php
 session_start();
-$dir = './assets/data/root';
 $_SESSION['root'] = "./assets/data/root/";
 $_SESSION['path'] = $_SESSION['root'];
 
 if (isset($_GET['path'])) {
   $_SESSION['path'] = $_GET['path'];
 }
-
-$_SESSION['root'] = "./assets/data/root/";
 
 //DELETE
 if (isset($_GET['delete'])) {
@@ -69,8 +66,9 @@ foreach ($fileListing as $file) {
                 <input type="file" name="fileToUpload" id="fileToUpload">
                 <input type="submit" value="Upload" name="submit">
               </form>
+              <hr />
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFolderModal">New</button>
-
+              <hr />
               <div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
@@ -95,8 +93,34 @@ foreach ($fileListing as $file) {
 
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
+
+              <div class="row">
+                <ul class="bread_crumbs">
+                  <?php
+                  $breadCrumbsNames = explode("/", $_SESSION['path']);
+                  $breadCPath = "";
+                  $checkPath = ["assets", "data", "."];
+                  foreach ($breadCrumbsNames as $key => $bredCrumb) {
+                    if (!empty($breadCPath)) {
+                      $breadCPath .= "/" . $bredCrumb;
+                    } else {
+                      $breadCPath = $bredCrumb;
+                    }
+
+                    $more = "";
+                    if ((count($breadCrumbsNames) - 1) != $key) {
+                      $more = "<span> > </span>";
+                    }
+                    if(!in_array($bredCrumb, $checkPath)){
+                      echo "<li><img src='./assets/data/images/folder_icon.png' width='12' />
+                      <a href='?path=$breadCPath'>$bredCrumb</a> &nbsp;$more</li>";
+                    }
+                  }
+                  ?>
+                </ul>
+              </div>
+              <hr />
               <ul class="folder-list" style="padding: 0" id="folderList">
-                <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
                 <?php
                 if (count($folders) == 0 && count($files) == 0) {
                   echo "<div>Folder is empty.</div>";
@@ -104,21 +128,11 @@ foreach ($fileListing as $file) {
                 foreach ($folders as $fileName) {
                   $fileInfo = $_SESSION['root']  . "/" . $fileName;
                   $filePath = $_SESSION['path'] . '/' . $fileName;
-                  echo "<li> <img src='./assets/data/images/folder_icon.png' width='12' /> <a href='?path=$filePath'>$fileName</a></li>";
+                  echo "<li><img src='./assets/data/images/folder_icon.png' width='12' /><a href='?path=$filePath'>$fileName</a></li>";
                 }
-                // foreach ($files as $fileName) {
-                //   $fileInfo = $dir . "/" . $fileName;
-                //   $fullUrl = $_SERVER['REQUEST_URI'];
-                //   $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
-                //   $viewFile = $fullUrl . '&' . 'view=' .  $fileName;
-                //   echo "<li> <img src='./assets/data/images/file_icon.png' width='12' /> <a href='javascript:;'>$fileName</a> 
-                //       <a href='$viewFile' class='view_btn'>View</a>
-                //       <a href='$deleteUrl' class='delete_btn'>Delete</a>
-                //   </li>";
-                // }
                 ?>
-
               </ul>
+
               <div class="clearfix"></div>
             </div>
           </div>
@@ -136,7 +150,7 @@ foreach ($fileListing as $file) {
                             <a href='?path=$filePath'>
                               <span class='corner'></span>
                               <div class='icon'>
-                                <i class='fa fa-file'></i>
+                                <i class='fa fa-folder'></i>
                               </div>
                               <div class='file-name'> $fileName <br>
                               <small>Added: Jan 11, 2014</small>
@@ -146,20 +160,31 @@ foreach ($fileListing as $file) {
                         </div>";
             }
             foreach ($files as $fileName) {
-            $file_Icon;
-            switch (pathinfo($fileName)['extension']) {
-              case 'txt': case 'pdf': case 'doc': $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
-                break;
-              case 'png': case 'jpg' : $file_Icon = '<div class="image"><img alt="image" class="img-responsive"
+              $file_Icon;
+              switch (pathinfo($fileName)['extension']) {
+                case 'txt':
+                case 'pdf':
+                case 'doc':
+                  $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
+                  break;
+                case 'png':
+                case 'jpg':
+                  $file_Icon = '<div class="image"><img alt="image" class="img-responsive"
                 src="https://via.placeholder.com/400x300/4169E1/000000"></div>';
-                break;
-              case 'webm': case 'mp4': case 'mpeg' : $file_Icon = "<div class='icon'><i class='img-responsive fa fa-film'></i></div>";
-              break;
-              case 'flac': case 'mp3': $file_Icon = "<div class='icon'><i class='fa fa-music'></i></div>";
-                break;
-              default: $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
-                break;
-            };
+                  break;
+                case 'webm':
+                case 'mp4':
+                case 'mpeg':
+                  $file_Icon = "<div class='icon'><i class='img-responsive fa fa-film'></i></div>";
+                  break;
+                case 'flac':
+                case 'mp3':
+                  $file_Icon = "<div class='icon'><i class='fa fa-music'></i></div>";
+                  break;
+                default:
+                  $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
+                  break;
+              };
               echo "<div class='file-box'>
               <div class='file'>
                 <a href='javascript:;'>
