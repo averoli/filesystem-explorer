@@ -5,4 +5,4 @@ $target_dir = '../data' . $path[1];
 if (!is_dir($target_dir . "/" . $_POST["folderName"])) {
     mkdir($target_dir . "/" . $_POST["folderName"], 0777);
 }
-header('Location: '. '?path='.$_SESSION['path'].'/'.$_POST["folderName"]);exit;
+header('Location: ../../index.php' . '?path='. $_SESSION['path']);
