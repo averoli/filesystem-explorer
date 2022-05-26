@@ -7,10 +7,21 @@ $urlPath = $dir;
 if (isset($_GET['path'])) {
   $urlPath = $_GET['path'];
   $_SESSION['path'] = $_GET['path'];
-  echo $_SESSION['path'];
 }
 
 $_SESSION['root'] = "./assets/data/root/";
+
+//DELETE
+if (isset($_GET['delete'])) {
+  $deleteFile = $_GET['delete'];
+  $fullDeletePath = $urlPath . '/' . $deleteFile;
+  if (file_exists($fullDeletePath)) {
+    unlink($fullDeletePath);
+  }
+  header('Location: ' . '?path=' . $urlPath);
+  exit;
+}
+
 // $_SESSION['path'] = "./assets/data/root/";
 //remove theb '..' and '.' from my array
 // $_SESSION['path'] = array_diff(scandir('./assets/data/root'), array('..', '.'));
