@@ -1,8 +1,32 @@
 <?php
 session_start();
+$dir = './assets/data/root';
+$_SESSION['path'] = $dir;
+$urlPath = $dir;
+
+if (isset($_GET['path'])) {
+  $urlPath = $_GET['path'];
+  $_SESSION['path'] = $_GET['path'];
+  echo $_SESSION['path'];
+}
+
 $_SESSION['root'] = "./assets/data/root/";
-$_SESSION['path'] = "./assets/data/root/";
-$_SESSION['currentPath'] = __DIR__;
+// $_SESSION['path'] = "./assets/data/root/";
+//remove theb '..' and '.' from my array
+// $_SESSION['path'] = array_diff(scandir('./assets/data/root'), array('..', '.'));
+
+$fileListing = array_diff(scandir($urlPath), array('..', '.'));
+
+$folders = array();
+$files = array();
+foreach ($fileListing as $file) {
+  $fileInfo = $urlPath . "/" . $file;
+  if (is_dir($fileInfo)) {
+    $folders[] = $file;
+  } else {
+    $files[] = $file;
+  }
+}
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +37,7 @@ $_SESSION['currentPath'] = __DIR__;
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" /> -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
   <link href="./assets/css/style.css" rel="stylesheet" />
   <script type="module" src="./assets/js/main.js"></script>
   <title>System file explorer</title>
@@ -42,7 +66,6 @@ $_SESSION['currentPath'] = __DIR__;
               </form>
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFolderModal">New</button>
 
-              <!-- Modal -->
               <div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
@@ -55,13 +78,11 @@ $_SESSION['currentPath'] = __DIR__;
                         <div class="mb-3">
                           <input type="text" class="form-control" name="folderName">
                         </div>
-
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                       <button type="submit" class="btn btn-primary" name="folder-button" id="createNewFolder">Create</button>
                     </div>
-
                     </form>
                   </div>
                 </div>
@@ -72,11 +93,23 @@ $_SESSION['currentPath'] = __DIR__;
               <ul class="folder-list" style="padding: 0" id="folderList">
                 <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
                 <?php
-                $dir = scandir($_SESSION['path']);
-                foreach ($dir as $key => $value) {
-                  if ($key > 0) {
-                    echo "<li id='folderList'><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i> $value </a></li>";
-                  }
+                if (count($folders) == 0 && count($files) == 0) {
+                  echo "<div>Folder is empty.</div>";
+                }
+                foreach ($folders as $fileName) {
+                  $fileInfo = $dir . "/" . $fileName;
+                  $filePath = $urlPath . '/' . $fileName;
+                  echo "<li> <img src='./assets/data/images/folder_icon.png' width='12' /> <a href='?path=$filePath'>$fileName</a></li>";
+                }
+                foreach ($files as $fileName) {
+                  $fileInfo = $dir . "/" . $fileName;
+                  $fullUrl = $_SERVER['REQUEST_URI'];
+                  $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
+                  $viewFile = $fullUrl . '&' . 'view=' .  $fileName;
+                  echo "<li> <img src='./assets/data/images/file_icon.png' width='12' /> <a href='javascript:;'>$fileName</a> 
+                      <a href='$viewFile' class='view_btn'>View</a>    
+                      <a href='$deleteUrl' class='delete_btn'>Delete</a>
+                  </li>";
                 }
                 ?>
 
