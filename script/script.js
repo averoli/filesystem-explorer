@@ -2,7 +2,7 @@ const folder = document.getElementById("folderName");
 
 let folderName = folder.addEventListener("change", function(e){
 console.log(e.target.value);
-    
+   
 })
 
 

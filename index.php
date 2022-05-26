@@ -1,3 +1,9 @@
+<?php
+session_start();
+$_SESSION['root'] = "./assets/data/root/";
+$_SESSION['path'] = "./assets/data/root/";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,8 +13,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-  <link href="./style.css" rel="stylesheet" />
-  <script src="./scripts/script.js" type="module"></script>
+  <link href="./assets/css/style.css" rel="stylesheet" />
+  <script type="module" src="./assets/js/main.js"></script>
   <title>System file explorer</title>
 </head>
 
@@ -28,8 +34,10 @@
         <div class="ibox float-e-margins">
           <div class="ibox-content">
             <div class="file-manager">
-              <form class="mb-0" action="folder.php" method="post" enctype="multipart/form-data">
+              <form class="mb-0" action="./assets/php/upload.php" method="post" enctype="multipart/form-data">
+                Upload file:
                 <input type="file" name="fileToUpload" id="fileToUpload">
+                <input type="submit" value="Upload" name="submit">
               </form>
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFolderModal">New</button>
 
@@ -42,56 +50,36 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                      <div class="mb-3">
-                        <input type="text" class="form-control" name="folder-name" id="folderName">
-                      </div>
+                      <form action="./assets/php/create.php" method="POST">
+                        <div class="mb-3">
+                          <input type="text" class="form-control" name="folderName">
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                      <button type="button" class="btn btn-primary" name="folder-button" id="createNewFolder">Create</button>
+                      <button type="submit" class="btn btn-primary" name="folder-button" id="createNewFolder">Create</button>
                     </div>
+
+                    </form>
                   </div>
                 </div>
               </div>
-              <?php
-              // try {
-              //   $newFileName = "./root/3-create-write-file.txt";
-              //   $fileContent = 'This is the content of the "3-create-write-file.txt" file.';
 
-              //   // Now the file is created, but it's empty.
-              //   $file = fopen($newFileName, "w");
-
-              //   // Here we add the content to the file
-              //   fwrite($file, $fileContent);
-
-              //   // You can add new content to the file
-              //   fwrite($file, "\nNew content in a new line.");
-
-              //   $file = fopen($newFileName, "r");
-
-              //   // Print the content
-              //   $content = fread($file, filesize($newFileName));
-              //   echo nl2br($content);
-
-              //   // Close the file buffer
-              //   fclose($file);
-              // } catch (Throwable $t) {
-              //   echo $t->getMessage();
-              // }
-
-
-              ?>
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
-              <ul id="folderList" class="folder-list" style="padding: 0">
-                <li><a href=""><i class="fa fa-folder"></i> Files</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Pictures</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Web pages</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Illustrations</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Films</a></li>
-                <li><a href=""><i class="fa fa-folder"></i> Books</a></li>
-              </ul>
+              <ul class="folder-list" style="padding: 0" id="folderList">
+                <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
+                <?php
+                $dir = scandir($_SESSION['path']);
+                foreach ($dir as $key => $value) {
+                  if ($key > 0) {
+                    echo "<li id='folderList'><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i> $value </a></li>";
+                  }
+                }
+                ?>
 
+              </ul>
               <div class="clearfix"></div>
             </div>
           </div>
