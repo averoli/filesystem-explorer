@@ -19,7 +19,6 @@ if (isset($_GET['delete'])) {
     unlink($fullDeletePath);
   }
   header('Location: ' . '?path=' . $urlPath);
-  exit;
 }
 
 // $_SESSION['path'] = "./assets/data/root/";
