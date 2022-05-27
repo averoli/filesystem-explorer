@@ -1,19 +1,21 @@
 <?php
 $content = "";
+echo $_GET['view'];
 if (isset($_GET['view']) && !empty($_GET['view'])) {
     $fileName = $_GET['view'];
     $fullFilePath = $_SESSION['path'] . '/' . $fileName;
+    echo $fullFilePath;
 
     if (file_exists($fullFilePath)) {
-        $myfile = fopen($fullFilePath, "r") or die("Unable to open file!");
+        echo  $myfile = fopen($fullFilePath, "r");
 
-        while (!feof($myfile)) {
-            $content .= fgets($myfile) . "<br>";
-        }
-        fclose($myfile);
-    } else {
-        $_SESSION['messages'] = "File already exists.";
-        $messageShow = true;
+        //     while (!feof($myfile)) {
+        //        echo $content .= fgets($myfile) . "<br>";
+        //     }
+        //     fclose($myfile);
+        // } else {
+        //     $_SESSION['messages'] = "File already exists.";
+        //     $messageShow = true;
     }
 }
 

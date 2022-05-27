@@ -1,6 +1,5 @@
 <?php
 session_start();
-$dir = './assets/data/root';
 $_SESSION['root'] = "./assets/data/root/";
 $_SESSION['path'] = $_SESSION['root'];
 
@@ -67,8 +66,9 @@ foreach ($fileListing as $file) {
                 <input type="file" name="fileToUpload" id="fileToUpload">
                 <input type="submit" value="Upload" name="submit">
               </form>
+              <hr />
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFolderModal">New</button>
-
+              <hr />
               <div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
@@ -93,8 +93,34 @@ foreach ($fileListing as $file) {
 
               <div class="hr-line-dashed"></div>
               <h5>Files</h5>
+
+              <div class="row">
+                <ul class="bread_crumbs">
+                  <?php
+                  $breadCrumbsNames = explode("/", $_SESSION['path']);
+                  $breadCPath = "";
+                  $checkPath = ["assets", "data", "."];
+                  foreach ($breadCrumbsNames as $key => $bredCrumb) {
+                    if (!empty($breadCPath)) {
+                      $breadCPath .= "/" . $bredCrumb;
+                    } else {
+                      $breadCPath = $bredCrumb;
+                    }
+
+                    $more = "";
+                    if ((count($breadCrumbsNames) - 1) != $key) {
+                      $more = "<span> > </span>";
+                    }
+                    if(!in_array($bredCrumb, $checkPath)){
+                      echo "<li><img src='./assets/data/images/folder_icon.png' width='12' />
+                      <a href='?path=$breadCPath'>$bredCrumb</a> &nbsp;$more</li>";
+                    }
+                  }
+                  ?>
+                </ul>
+              </div>
+              <hr />
               <ul class="folder-list" style="padding: 0" id="folderList">
-                <li id='folderList' hidden><a id='treeItem' name='treeItem'><i class='fa fa-folder'></i></a></li>
                 <?php
                 if (count($folders) == 0 && count($files) == 0) {
                   echo "<div>Folder is empty.</div>";
@@ -102,11 +128,11 @@ foreach ($fileListing as $file) {
                 foreach ($folders as $fileName) {
                   $fileInfo = $_SESSION['root']  . "/" . $fileName;
                   $filePath = $_SESSION['path'] . '/' . $fileName;
-                  echo "<li> <img src='./assets/data/images/folder_icon.png' width='12' /> <a href='?path=$filePath'>$fileName</a></li>";
+                  echo "<li><img src='./assets/data/images/folder_icon.png' width='12' /><a href='?path=$filePath'>$fileName</a></li>";
                 }
                 ?>
-
               </ul>
+
               <div class="clearfix"></div>
             </div>
           </div>
@@ -124,7 +150,7 @@ foreach ($fileListing as $file) {
                             <a href='?path=$filePath'>
                               <span class='corner'></span>
                               <div class='icon'>
-                                <i class='fa fa-file'></i>
+                                <i class='fa fa-folder'></i>
                               </div>
                               <div class='file-name'> $fileName <br>
                               <small>Added: Jan 11, 2014</small>
