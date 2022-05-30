@@ -1,5 +1,5 @@
 const treeListPath = "http://localhost/filesystem-explorer/assets/root";
-
+console.log("HELLO");
 // const response = fetch(treeListPath).then(function(response) {
 //     return response.blob();
 //   });

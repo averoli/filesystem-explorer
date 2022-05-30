@@ -1,4 +1,9 @@
 <?php
+$filename = './assets/php/search.php';
+$mode = '0777';
+chmod($filename, $mode);
+
+
 session_start();
 $_SESSION['root'] = "./assets/data/root";
 $_SESSION['path'] = $_SESSION['root'];
@@ -25,6 +30,18 @@ if (isset($_GET['view'])) {
   header('Location: ' . $_SESSION['media']);
 }
 
+//INFO
+if (isset($_GET['info'])) {
+  $infoFileName = $_GET['info'];
+  $fullfilePath = $_SESSION['path'] . '/' . $infoFileName;
+  $_SESSION['fileName'] = $infoFileName;
+  $_SESSION['size'] = filesize($fullfilePath);
+  $_SESSION['type'] = filetype($fullfilePath);
+  $_SESSION['author'] = fileowner($fullfilePath);
+  $_SESSION['lastModified'] = filemtime($fullfilePath);
+  
+}
+
 //REMOVE . AND ..
 $fileListing = array_diff(scandir($_SESSION['path']), array('..', '.'));
 
@@ -43,39 +60,39 @@ foreach ($fileListing as $file) {
 //IMAGE THUMBNAIL
 function makeThumbnails($updir, $img, $id)
 {
-    $thumbnail_width = 134;
-    $thumbnail_height = 189;
-    $thumb_beforeword = "thumb";
-    $arr_image_details = getimagesize("$updir" . $id . '_' . "$img"); // pass id to thumb name
-    $original_width = $arr_image_details[0];
-    $original_height = $arr_image_details[1];
-    if ($original_width > $original_height) {
-        $new_width = $thumbnail_width;
-        $new_height = intval($original_height * $new_width / $original_width);
-    } else {
-        $new_height = $thumbnail_height;
-        $new_width = intval($original_width * $new_height / $original_height);
-    }
-    $dest_x = intval(($thumbnail_width - $new_width) / 2);
-    $dest_y = intval(($thumbnail_height - $new_height) / 2);
-    if ($arr_image_details[2] == IMAGETYPE_GIF) {
-        $imgt = "ImageGIF";
-        $imgcreatefrom = "ImageCreateFromGIF";
-    }
-    if ($arr_image_details[2] == IMAGETYPE_JPEG) {
-        $imgt = "ImageJPEG";
-        $imgcreatefrom = "ImageCreateFromJPEG";
-    }
-    if ($arr_image_details[2] == IMAGETYPE_PNG) {
-        $imgt = "ImagePNG";
-        $imgcreatefrom = "ImageCreateFromPNG";
-    }
-    if ($imgt) {
-        $old_image = $imgcreatefrom("$updir" . $id . '_' . "$img");
-        $new_image = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
-        imagecopyresized($new_image, $old_image, $dest_x, $dest_y, 0, 0, $new_width, $new_height, $original_width, $original_height);
-        $imgt($new_image, "$updir" . $id . '_' . "$thumb_beforeword" . "$img");
-    }
+  $thumbnail_width = 134;
+  $thumbnail_height = 189;
+  $thumb_beforeword = "thumb";
+  $arr_image_details = getimagesize("$updir" . $id . '_' . "$img"); // pass id to thumb name
+  $original_width = $arr_image_details[0];
+  $original_height = $arr_image_details[1];
+  if ($original_width > $original_height) {
+    $new_width = $thumbnail_width;
+    $new_height = intval($original_height * $new_width / $original_width);
+  } else {
+    $new_height = $thumbnail_height;
+    $new_width = intval($original_width * $new_height / $original_height);
+  }
+  $dest_x = intval(($thumbnail_width - $new_width) / 2);
+  $dest_y = intval(($thumbnail_height - $new_height) / 2);
+  if ($arr_image_details[2] == IMAGETYPE_GIF) {
+    $imgt = "ImageGIF";
+    $imgcreatefrom = "ImageCreateFromGIF";
+  }
+  if ($arr_image_details[2] == IMAGETYPE_JPEG) {
+    $imgt = "ImageJPEG";
+    $imgcreatefrom = "ImageCreateFromJPEG";
+  }
+  if ($arr_image_details[2] == IMAGETYPE_PNG) {
+    $imgt = "ImagePNG";
+    $imgcreatefrom = "ImageCreateFromPNG";
+  }
+  if ($imgt) {
+    $old_image = $imgcreatefrom("$updir" . $id . '_' . "$img");
+    $new_image = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
+    imagecopyresized($new_image, $old_image, $dest_x, $dest_y, 0, 0, $new_width, $new_height, $original_width, $original_height);
+    $imgt($new_image, "$updir" . $id . '_' . "$thumb_beforeword" . "$img");
+  }
 }
 
 ?>
@@ -90,7 +107,8 @@ function makeThumbnails($updir, $img, $id)
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
   <link href="./assets/css/style.css" rel="stylesheet" />
-  <script type="module" src="./assets/js/main.js"></script>
+  <script type="module" src=""></script>
+  <script src="./assets/js/search.js"></script>
   <title>System file explorer</title>
 </head>
 
@@ -99,8 +117,8 @@ function makeThumbnails($updir, $img, $id)
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
         <a class="navbar-brand">File System Explorer</a>
-        <form class="d-flex" action="./assets/php/search.php" method="GET">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="keyword">
+        <form class="d-flex" action="./assets/php/search.php" method="POST">
+          <input class="form-control me-2" type="search" placeholder="Add keyword to search" aria-label="Search" name="keyword" id="keyword">
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
         <div class="row gx-0">
@@ -182,6 +200,9 @@ function makeThumbnails($updir, $img, $id)
             foreach ($folders as $fileName) {
               $fileInfo = $_SESSION['root']  . "/" . $fileName;
               $filePath = $_SESSION['path'] . '/' . $fileName;
+              $fullUrl = $_SERVER['REQUEST_URI'];
+              $infoUrl = $fullUrl . '&' . 'info=' .  $fileName;
+              $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
               echo "<div class='file-box no-gutters'>
                           <div class='file'>
                             <a href='?path=$filePath'>
@@ -189,8 +210,10 @@ function makeThumbnails($updir, $img, $id)
                               <div class='icon'>
                                 <i class='fa fa-folder'></i>
                               </div>
-                              <div class='file-name'> $fileName <br>
-                              <small>Added: Jan 11, 2014</small>
+                              <div class='file-name' > $fileName <br>
+                              <small>Added: Jan 11, 2014</small> <hr>
+                              <a href='$deleteUrl' class='delete_btn'>Delete</a>
+                              <a href='$infoUrl' class='info_btn'>Info</a>
                               </div>
                             </a>
                           </div>
@@ -200,6 +223,7 @@ function makeThumbnails($updir, $img, $id)
             foreach ($files as $fileName) {
               $file_Icon;
               $fullUrl = $_SERVER['REQUEST_URI'];
+              $infoUrl = $fullUrl . '&' . 'info=' .  $fileName;
               $viewFile = $fullUrl . '&' . 'view=' .  $fileName;
               $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
               switch (pathinfo($fileName)['extension']) {
@@ -213,8 +237,8 @@ function makeThumbnails($updir, $img, $id)
                 case 'jpeg':
                   $previewImg =  $_SESSION['path'] . '/' . $fileName;
                   $file_Icon = '<div class="image">
-                  <a target="_blank" href='.$previewImg.'>
-                    <img alt="image" class="img-responsive" src='.$previewImg.' style="width:200px">
+                  <a target="_blank" href=' . $previewImg . '>
+                    <img alt="image" class="img-responsive" src=' . $previewImg . ' style="width:200px">
                   </a></div>';
                   // $file_Icon = "<div class='icon'><i class='img-responsive fa fa-picture-o'></i></div>";
                   break;
@@ -234,13 +258,14 @@ function makeThumbnails($updir, $img, $id)
 
               echo "<div class='file-box'>
               <div class='file'>
-                <a href='javascript:;'>
+                <a href='$infoUrl'>
                   <span class='corner'></span>
                     $file_Icon
                   <div class='file-name'> $fileName <br>
                   <small>Added: Jan 11, 2014</small> <br>
                   <a href='$viewFile' class='view_btn'>View</a>
                   <a href='$deleteUrl' class='delete_btn'>Delete</a>
+                  <a href='$infoUrl' class='info_btn'>Info</a>
                   </div>
                 </a>
               </div>
@@ -260,15 +285,16 @@ function makeThumbnails($updir, $img, $id)
               </button>
             </h2>
             <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <img src="./assets/data/images/file_icon.png" alt="">
-                <p>File Name</p>
-                <p>Creating date:</p><a href="">Value</a>
-                <p>Last modify date:</p><a href="">Value</a>
-                <p>Extension:</p><a href="">Value</a>
-                <p>Size:</p><a href="">Value</a>
-                <p>Author:</p><a href="">Value</a>
-                <p>Description: Lorem ipsum dolor sit amet.</p>
+              <div class="accordion-body" id="accordion_body">
+                <?php
+                  echo '<img src="./assets/data/images/file_icon.png" alt="">.<hr>';
+                  echo '<p>'.$_SESSION["fileName"].'</p>';
+                  echo '<a href="">Extension:</a><p>'.$_SESSION["type"].'</p>';
+                  echo '<a href="">Size:</a><p>'.$_SESSION["size"].'</p>';
+                  echo '<a href="">Author:</a><p>'.$_SESSION["author"].'</p>';
+                  echo '<a href="">Last Modified:</a><p>'. date ("F d Y H:i:s.", $_SESSION["lastModified"]).'</p>';
+                  echo '<p>Description: Lorem ipsum dolor sit amet.</p>';
+                ?>
               </div>
             </div>
           </div>
@@ -332,20 +358,3 @@ function makeThumbnails($updir, $img, $id)
 </body>
 
 </html>
-
-<!-- <a href='$viewFile' class='view_btn' data-bs-toggle='modal' data-bs-target='#viewModal'>
-  View
-</a>
-<div class='modal fade' id='viewModal' tabindex='-1' aria-labelledby='newFolderModalLabel' aria-hidden='true'>
-  <div class='modal-dialog'>
-    <div class='modal-content'>
-      <div class='modal-header'>
-        <h5 class='modal-title' id='newFolderModalLabel'>$fileName</h5>
-        <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-      </div>
-      <div class='modal-body'>
-        <iframe width='560' height='315' src='./assets/php/open.php' frameBorder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowFullScreen></iframe>
-      </div>
-    </div>
-  </div>
-</div> -->
