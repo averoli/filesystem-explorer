@@ -1,8 +1,9 @@
 <?php
 session_start();
-$_SESSION['root'] = "./assets/data/root/";
+$_SESSION['root'] = "./assets/data/root";
 $_SESSION['path'] = $_SESSION['root'];
 
+//PATH
 if (isset($_GET['path'])) {
   $_SESSION['path'] = $_GET['path'];
 }
@@ -17,14 +18,19 @@ if (isset($_GET['delete'])) {
   header('Location: ' . '?path=' . $_SESSION['path']);
 }
 
+//VIEW
 if (isset($_GET['view'])) {
-  echo $_GET['view'];
+  $viewFileName = $_GET['view'];
+  $_SESSION['media'] = $_SESSION['path'] . '/' . $viewFileName;
+  header('Location: ' . $_SESSION['media']);
 }
 
+//REMOVE . AND ..
 $fileListing = array_diff(scandir($_SESSION['path']), array('..', '.'));
 
 $folders = array();
 $files = array();
+
 foreach ($fileListing as $file) {
   $fileInfo = $_SESSION['path'] . "/" . $file;
   if (is_dir($fileInfo)) {
@@ -33,6 +39,45 @@ foreach ($fileListing as $file) {
     $files[] = $file;
   }
 }
+
+//IMAGE THUMBNAIL
+function makeThumbnails($updir, $img, $id)
+{
+    $thumbnail_width = 134;
+    $thumbnail_height = 189;
+    $thumb_beforeword = "thumb";
+    $arr_image_details = getimagesize("$updir" . $id . '_' . "$img"); // pass id to thumb name
+    $original_width = $arr_image_details[0];
+    $original_height = $arr_image_details[1];
+    if ($original_width > $original_height) {
+        $new_width = $thumbnail_width;
+        $new_height = intval($original_height * $new_width / $original_width);
+    } else {
+        $new_height = $thumbnail_height;
+        $new_width = intval($original_width * $new_height / $original_height);
+    }
+    $dest_x = intval(($thumbnail_width - $new_width) / 2);
+    $dest_y = intval(($thumbnail_height - $new_height) / 2);
+    if ($arr_image_details[2] == IMAGETYPE_GIF) {
+        $imgt = "ImageGIF";
+        $imgcreatefrom = "ImageCreateFromGIF";
+    }
+    if ($arr_image_details[2] == IMAGETYPE_JPEG) {
+        $imgt = "ImageJPEG";
+        $imgcreatefrom = "ImageCreateFromJPEG";
+    }
+    if ($arr_image_details[2] == IMAGETYPE_PNG) {
+        $imgt = "ImagePNG";
+        $imgcreatefrom = "ImageCreateFromPNG";
+    }
+    if ($imgt) {
+        $old_image = $imgcreatefrom("$updir" . $id . '_' . "$img");
+        $new_image = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
+        imagecopyresized($new_image, $old_image, $dest_x, $dest_y, 0, 0, $new_width, $new_height, $original_width, $original_height);
+        $imgt($new_image, "$updir" . $id . '_' . "$thumb_beforeword" . "$img");
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -54,8 +99,8 @@ foreach ($fileListing as $file) {
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
         <a class="navbar-brand">File System Explorer</a>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="d-flex" action="./assets/php/search.php" method="GET">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="keyword">
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
         <div class="row gx-0">
@@ -131,13 +176,13 @@ foreach ($fileListing as $file) {
       </div>
 
       <div class="col-md-8 animated fadeInRight">
-        <!-- <div class="row"> -->
-        <div>
-          <?php
-          foreach ($folders as $fileName) {
-            $fileInfo = $_SESSION['root']  . "/" . $fileName;
-            $filePath = $_SESSION['path'] . '/' . $fileName;
-            echo "<div class='file-box no-gutters'>
+        <div class="row">
+          <div>
+            <?php
+            foreach ($folders as $fileName) {
+              $fileInfo = $_SESSION['root']  . "/" . $fileName;
+              $filePath = $_SESSION['path'] . '/' . $fileName;
+              echo "<div class='file-box no-gutters'>
                           <div class='file'>
                             <a href='?path=$filePath'>
                               <span class='corner'></span>
@@ -150,78 +195,60 @@ foreach ($fileListing as $file) {
                             </a>
                           </div>
                         </div>";
-          }
+            }
 
-          foreach ($files as $fileName) {
-            $file_Icon;
-            $fullUrl = $_SERVER['REQUEST_URI'];
-            $viewFile = $fullUrl . '&' . 'view=' .  $fileName;
-            $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
-            switch (pathinfo($fileName)['extension']) {
-              case 'txt':
-              case 'pdf':
-              case 'doc':
-                $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
-                break;
-              case 'png':
-              case 'jpg':
-              case 'jpeg':
-                $file_Icon = '<div class="image">
-                                <img alt="image" class="img-responsive" src=<?php ?>>
-                                </div>';
-                break;
-              case 'webm':
-              case 'mp4':
-              case 'mpeg':
-                $file_Icon = "<div class='icon'><i class='img-responsive fa fa-film'></i></div>";
-                break;
-              case 'flac':
-              case 'mp3':
-                $file_Icon = "<div class='icon'><i class='fa fa-music'></i></div>";
-                break;
-              default:
-                $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
-                break;
-            };
+            foreach ($files as $fileName) {
+              $file_Icon;
+              $fullUrl = $_SERVER['REQUEST_URI'];
+              $viewFile = $fullUrl . '&' . 'view=' .  $fileName;
+              $deleteUrl = $fullUrl . '&' . 'delete=' .  $fileName;
+              switch (pathinfo($fileName)['extension']) {
+                case 'txt':
+                case 'pdf':
+                case 'doc':
+                  $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
+                  break;
+                case 'png':
+                case 'jpg':
+                case 'jpeg':
+                  $previewImg =  $_SESSION['path'] . '/' . $fileName;
+                  $file_Icon = '<div class="image">
+                  <a target="_blank" href='.$previewImg.'>
+                    <img alt="image" class="img-responsive" src='.$previewImg.' style="width:200px">
+                  </a></div>';
+                  // $file_Icon = "<div class='icon'><i class='img-responsive fa fa-picture-o'></i></div>";
+                  break;
+                case 'webm':
+                case 'mp4':
+                case 'mpeg':
+                  $file_Icon = "<div class='icon'><i class='img-responsive fa fa-film'></i></div>";
+                  break;
+                case 'flac':
+                case 'mp3':
+                  $file_Icon = "<div class='icon'><i class='fa fa-music'></i></div>";
+                  break;
+                default:
+                  $file_Icon = "<div class='icon'><i class='fa fa-file'></i></div>";
+                  break;
+              };
 
-            echo "<div class='file-box'>
+              echo "<div class='file-box'>
               <div class='file'>
                 <a href='javascript:;'>
                   <span class='corner'></span>
                     $file_Icon
                   <div class='file-name'> $fileName <br>
                   <small>Added: Jan 11, 2014</small> <br>
-                  <a href='$viewFile' class='view_btn' data-bs-toggle='modal' data-bs-target='#viewModal'>
-                  View
-                  </a>
-                  <div class='modal fade' id='viewModal' tabindex='-1' aria-labelledby='newFolderModalLabel' aria-hidden='true'>
-                <div class='modal-dialog'>
-                  <div class='modal-content'>
-                    <div class='modal-header'>
-                      <h5 class='modal-title' id='newFolderModalLabel'>$fileName</h5>
-                      <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-                    </div>
-                    <div class='modal-body'>
-                    <iframe
-                      width='560'
-                      height='315'
-                      src='./assets/php/open.php'
-                      frameBorder='0'
-                      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                      allowFullScreen></iframe>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
+                  <a href='$viewFile' class='view_btn'>View</a>
                   <a href='$deleteUrl' class='delete_btn'>Delete</a>
                   </div>
                 </a>
               </div>
             </div>";
-          }
-          ?>
+            }
+            ?>
+          </div>
         </div>
-        <!-- </div> -->
       </div>
 
       <div class="col-md-2">
@@ -305,3 +332,20 @@ foreach ($fileListing as $file) {
 </body>
 
 </html>
+
+<!-- <a href='$viewFile' class='view_btn' data-bs-toggle='modal' data-bs-target='#viewModal'>
+  View
+</a>
+<div class='modal fade' id='viewModal' tabindex='-1' aria-labelledby='newFolderModalLabel' aria-hidden='true'>
+  <div class='modal-dialog'>
+    <div class='modal-content'>
+      <div class='modal-header'>
+        <h5 class='modal-title' id='newFolderModalLabel'>$fileName</h5>
+        <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+      </div>
+      <div class='modal-body'>
+        <iframe width='560' height='315' src='./assets/php/open.php' frameBorder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowFullScreen></iframe>
+      </div>
+    </div>
+  </div>
+</div> -->
